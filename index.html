@@ -17,27 +17,12 @@
         padding: 15px;
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
       }
 
       h2 {
         color: #333;
       }
-
-      button {
-        background-color: #4caf50;
-        color: white;
-        padding: 10px 20px;
-        text-align: center;
-        font-size: 16px;
-        margin-bottom: 10px;
-        cursor: pointer;
-        border-radius: 3px;
-      }
-
-      button:hover {
-        background-color: #45a049;
-      }
+      
     </style>
   </head>
   <body>
@@ -102,7 +87,7 @@
 
       function moveBall() {
         if (isSessionActive) {
-          ball.setVelocity(0, 800);
+          ball.setVelocity(0, 700);
         }
       }
 
@@ -110,7 +95,7 @@
 
       function startSession() {
         if (isSessionActive) {
-          console.log("Session already active");
+          console.log("Session is still active");
           return;
         }
 
