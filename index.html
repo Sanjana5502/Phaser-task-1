@@ -76,29 +76,22 @@
 
       const game = new Phaser.Game(config);
       let clockSound;
-
       let ball;
       let isSessionActive = false;
-
       function preload() {
         this.load.image("ball", "./ball.png");
         this.load.audio("clock", "./clock-sound.mp3");
       //  this.load.image('sky', './clouds.png');
-        
       }
-
       function create() {
         ball = this.physics.add.sprite(100, 800, "ball");
         ball.setBounce(0);
         ball.setCollideWorldBounds(true);
         ball.setVelocity(0, 0);
         ball.setScale(0.1);
-
         clockSound = this.sound.add("clock");
         //this.add.image(400, 300, 'sky');
-
       }
-
       function update() {
         if (isSessionActive) {
         }
@@ -109,29 +102,22 @@
           ball.setVelocity(0, 600);
         }
       }
-
       const sessionList = [];
-
       function startSession() {
         if (isSessionActive) {
           console.log("Session is active");
           return;
         }
-
         isSessionActive = true;
         ball.setBounce(1)
-
         const sessionId = generateSessionId();
         const counter = Phaser.Math.Between(30, 60);
         const startTime = new Date();
         const endTime = new Date(startTime.getTime() + counter * 1000);
-
         startCountdownAndMove(counter, sessionId, startTime, endTime);
       }
-
       function startCountdownAndMove(counter, sessionId, startTime, endTime) {
         let currentCounter = counter;
-
         const countdownInterval = setInterval(() => {
           document.getElementById(
             "counter-display"
@@ -144,24 +130,17 @@
               "Session Ended";
             isSessionActive = false;
             ball.setBounce(0)
-
             clockSound.stop();
-
             sessionList.push({ sessionId, startTime, endTime });
             updateSessionList();
           }
-
           currentCounter--;
         }, 1000);
-
         moveBall();
       }
-
       function generateSessionId() {
       return Date.now().toString(36) + Math.random().toString(36).substring(7);
       }
-
-
       function updateSessionList() {
         const sessionListElement = document.getElementById("display");
         sessionListElement.innerHTML = "";
@@ -174,7 +153,6 @@
           sessionListElement.appendChild(listItem);
         });
       }
-
       function toggleSessionDetails(session, listItem) {
         const detailsContainer = document.getElementById("display");
         const existingDetails = listItem.querySelector('.session-details');
