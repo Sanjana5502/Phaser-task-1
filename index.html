@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phaser Game</title>
+    <style>
+      body {
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+      }
+
+      #right-panel {
+        background-color: #f0f0f0;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      h2 {
+        color: #333;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        font-size: 16px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        border-radius: 3px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container"></div>
+    <div id="right-panel">
+      <h2>Session History</h2>
+      <button onclick="startSession()">Start Session</button>
+      <div id="display"></div>
+      <div id="counter-display"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser/dist/phaser.min.js"></script>
+    <script>
+      const config = {
+        type: Phaser.AUTO,
+        width: 1000,
+        height: 500,
+        physics: {
+          default: "arcade",
+          arcade: {
+            gravity:{y:300},
+            debug: false,
+          },
+        },
+        scene: {
+          preload: preload,
+          create: create,
+          update: update,
+        },
+      };
+
+      const game = new Phaser.Game(config);
+      let clockSound;
+
+      let ball;
+      let isSessionActive = false;
+
+      function preload() {
+        this.load.image("ball", "./ball.png");
+        this.load.audio("clock", "./clock-sound.mp3");
+      }
+
+      function create() {
+        ball = this.physics.add.sprite(300, 900, "ball");
+ ball.setBounce(0);
+ ball.setCollideWorldBounds(true);
+ ball.setVelocity(0, 0);
+ ball.setScale(0.1);
+
+ clockSound = this.sound.add("clock");
+
+ this.cameras.main.setBackgroundColor('#87CEEB');
+      }
+
+      function update() {
+ if (isSessionActive) {
+    clockSound.once('complete', function() {
+      ball.setVelocity(0, 0);
+    });
+ }
+}
+
+      function moveBall() {
+        if (isSessionActive) {
+          ball.setVelocity(0, 800);
+        }
+      }
+
+      const sessionList = [];
+
+      function startSession() {
+        if (isSessionActive) {
+          console.log("Session already active");
+          return;
+        }
+
+        isSessionActive = true;
+        ball.setBounce(1)
+
+        const sessionId = generateSessionId();
+        const counter = Phaser.Math.Between(30, 60);
+        const startTime = new Date();
+        const endTime = new Date(startTime.getTime() + counter * 1000);
+
+        startCountdownAndMove(counter, sessionId, startTime, endTime);
+      }
+
+      function startCountdownAndMove(counter, sessionId, startTime, endTime) {
+ let currentCounter = counter;
+
+ const countdownInterval = setInterval(() => {
+    document.getElementById(
+      "counter-display"
+    ).textContent = `Counter: ${currentCounter}s`;
+    clockSound.play();
+
+    if (currentCounter === 0) {
+      clearInterval(countdownInterval);
+      document.getElementById("counter-display").textContent = "Session Ended";
+      isSessionActive = false;
+      ball.setBounce(0)
+
+      clockSound.stop();
+      ball.setVelocity(0, 0); // Add this line to stop the ball's velocity
+
+      const remainingTime = new Date(endTime).getTime() - new Date().getTime();
+      if (remainingTime > 0) {
+        setTimeout(() => {
+          ball.setVelocity(0, 0); // Stop the ball after the remaining time
+        }, remainingTime);
+      }
+
+      sessionList.push({ sessionId, startTime, endTime });
+      updateSessionList();
+    }
+
+    currentCounter--;
+ }, 1000);
+
+ moveBall();
+}
+
+      function generateSessionId() {
+        return Math.random().toString(36).substring(7);
+      }
+
+      function updateSessionList() {
+        const sessionListElement = document.getElementById("display");
+        sessionListElement.innerHTML = "";
+
+        sessionList.forEach((session) => {
+          const listItem1 = document.createElement("p");
+          const listItem2 = document.createElement("p");
+          const listItem3 = document.createElement("p");
+          listItem1.textContent = `Session ID: ${session.sessionId}`;
+          listItem2.textContent = `Start Time: ${session.startTime}`;
+          listItem3.textContent = `End Time: ${session.endTime}`;
+          sessionListElement.appendChild(listItem1);
+          sessionListElement.appendChild(listItem2);
+          sessionListElement.appendChild(listItem3);
+        });
+      }
+    </script>
+  </body>
+</html>
